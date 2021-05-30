@@ -1,0 +1,32 @@
+{
+  "name": "automerge-dependabot",
+  "version": "1.0.0",
+  "description": "A Github Actions action to automatically merge Dependabot PRs",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "lint:prettier": "prettier -c '*.js'",
+    "lint:eslint": "eslint ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jo-sm/automerge-dependabot.git"
+  },
+  "author": "Joshua Smock",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jo-sm/automerge-dependabot/issues"
+  },
+  "homepage": "https://github.com/jo-sm/automerge-dependabot#readme",
+  "dependencies": {
+    "@actions/core": "^1.3.0",
+    "@actions/github": "^5.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^7.27.0",
+    "eslint-plugin-jest": "^24.3.6",
+    "jest": "^27.0.1",
+    "prettier": "^2.3.0"
+  }
+}
