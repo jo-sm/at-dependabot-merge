@@ -6,8 +6,8 @@
   "scripts": {
     "test": "jest",
     "test:watch": "jest --watch",
-    "lint:prettier": "prettier -c '*.js'",
-    "lint:eslint": "eslint ."
+    "lint:prettier": "prettier -c 'src/*.js'",
+    "lint:eslint": "eslint src/*"
   },
   "repository": {
     "type": "git",

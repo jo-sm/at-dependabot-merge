@@ -12,5 +12,5 @@ inputs:
     description: Workflow run ID
     required: true
 runs:
-  using: node12
-  main: index.js
+  using: "docker"
+  image: "Dockerfile"
