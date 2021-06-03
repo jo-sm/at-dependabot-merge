@@ -1,9 +1,8 @@
-name: Add Dependabot merge comment
-description: |
-  Given a workflow run ID, determine if the run was successful and if the related PR
-  was created by Dependabot. If it is, create a `@dependabot merge` comment.
-
-  The user who creates the comment must have push permission for the repository.
+name: Merge Dependabot PRs automatically
+description: Create a `@dependabot merge` comment for successfully checked PRs
+branding:
+  icon: "check-square"
+  color: "green"
 inputs:
   token:
     description: Github token for user with push permissions on the repo
