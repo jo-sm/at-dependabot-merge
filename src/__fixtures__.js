@@ -1,31 +1,23 @@
 const fixtures = {
   getWorkflowRun: {
+    NOT_COMPLETED: {
+      data: {
+        status: "queued",
+        pull_requests: [{ number: 7 }],
+      },
+    },
     SUCCESS: {
       data: {
         status: "completed",
         conclusion: "success",
-        pull_requests: [
-          {
-            number: 7,
-          },
-        ],
+        pull_requests: [{ number: 7 }],
       },
     },
     SUCCESS_MULTIPLE_PRS: {
       data: {
         status: "completed",
         conclusion: "success",
-        pull_requests: [
-          {
-            number: 7,
-          },
-          {
-            number: 20,
-          },
-          {
-            number: -1,
-          },
-        ],
+        pull_requests: [{ number: 7 }, { number: 20 }, { number: -1 }],
       },
     },
     SUCCESS_NO_PRS: {
@@ -39,6 +31,13 @@ const fixtures = {
       data: {
         status: "completed",
         conclusion: "failure",
+        pull_requests: [{ number: 7 }],
+      },
+    },
+    SKIPPED: {
+      data: {
+        status: "completed",
+        conclusion: "skipped",
         pull_requests: [{ number: 7 }],
       },
     },
@@ -58,42 +57,16 @@ const fixtures = {
                   checkSuites: {
                     nodes: [
                       {
-                        checkRuns: {
-                          nodes: [
-                            {
-                              name: "some cool name",
-                              conclusion: "SUCCESS",
-                              status: "COMPLETED",
-                            },
-                          ],
-                        },
+                        status: "COMPLETED",
+                        conclusion: "SUCCESS",
                       },
                       {
-                        checkRuns: {
-                          nodes: [
-                            {
-                              name: "another cool name",
-                              conclusion: "SUCCESS",
-                              status: "COMPLETED",
-                            },
-                          ],
-                        },
+                        status: "COMPLETED",
+                        conclusion: "SUCCESS",
                       },
                       {
-                        checkRuns: {
-                          nodes: [
-                            {
-                              name: "third cool name",
-                              conclusion: "SUCCESS",
-                              status: "COMPLETED",
-                            },
-                            {
-                              name: "third cool name, again",
-                              conclusion: "SUCCESS",
-                              status: "COMPLETED",
-                            },
-                          ],
-                        },
+                        status: "COMPLETED",
+                        conclusion: "SUCCESS",
                       },
                     ],
                   },
@@ -118,15 +91,8 @@ const fixtures = {
                   checkSuites: {
                     nodes: [
                       {
-                        checkRuns: {
-                          nodes: [
-                            {
-                              name: "some cool name",
-                              conclusion: "SUCCESS",
-                              status: "COMPLETED",
-                            },
-                          ],
-                        },
+                        status: "COMPLETED",
+                        conclusion: "SUCCESS",
                       },
                     ],
                   },
@@ -151,26 +117,12 @@ const fixtures = {
                   checkSuites: {
                     nodes: [
                       {
-                        checkRuns: {
-                          nodes: [
-                            {
-                              name: "some cool name",
-                              conclusion: "SUCCESS",
-                              status: "COMPLETED",
-                            },
-                          ],
-                        },
+                        status: "COMPLETED",
+                        conclusion: "SUCCESS",
                       },
                       {
-                        checkRuns: {
-                          nodes: [
-                            {
-                              name: "another cool name",
-                              conclusion: "FAILURE",
-                              status: "COMPLETED",
-                            },
-                          ],
-                        },
+                        status: "COMPLETED",
+                        conclusion: "FAILURE",
                       },
                     ],
                   },
@@ -195,26 +147,112 @@ const fixtures = {
                   checkSuites: {
                     nodes: [
                       {
-                        checkRuns: {
-                          nodes: [
-                            {
-                              name: "some cool name",
-                              conclusion: "FAILURE",
-                              status: "COMPLETED",
-                            },
-                          ],
-                        },
+                        status: "COMPLETED",
+                        conclusion: "FAILURE",
                       },
                       {
-                        checkRuns: {
-                          nodes: [
-                            {
-                              name: "another cool name",
-                              conclusion: "FAILURE",
-                              status: "COMPLETED",
-                            },
-                          ],
-                        },
+                        status: "COMPLETED",
+                        conclusion: "FAILURE",
+                      },
+                    ],
+                  },
+                },
+              },
+            ],
+          },
+        },
+      },
+    },
+    SOME_SKIPPED: {
+      repository: {
+        pullRequest: {
+          author: {
+            login: "dependabot",
+            __typename: "Bot",
+          },
+          commits: {
+            nodes: [
+              {
+                commit: {
+                  checkSuites: {
+                    nodes: [
+                      {
+                        status: "COMPLETED",
+                        conclusion: "SKIPPED",
+                      },
+                      {
+                        status: "COMPLETED",
+                        conclusion: "SUCCESS",
+                      },
+                    ],
+                  },
+                },
+              },
+            ],
+          },
+        },
+      },
+    },
+    SOME_SKIPPED_WITH_FAILURE: {
+      repository: {
+        pullRequest: {
+          author: {
+            login: "dependabot",
+            __typename: "Bot",
+          },
+          commits: {
+            nodes: [
+              {
+                commit: {
+                  checkSuites: {
+                    nodes: [
+                      {
+                        status: "COMPLETED",
+                        conclusion: "SKIPPED",
+                      },
+                      {
+                        status: "COMPLETED",
+                        conclusion: "SUCCESS",
+                      },
+                      {
+                        status: "COMPLETED",
+                        conclusion: "FAILURE",
+                      },
+                    ],
+                  },
+                },
+              },
+            ],
+          },
+        },
+      },
+    },
+    SOME_SUITES_NOT_COMPLETED: {
+      repository: {
+        pullRequest: {
+          author: {
+            login: "dependabot",
+            __typename: "Bot",
+          },
+          commits: {
+            nodes: [
+              {
+                commit: {
+                  checkSuites: {
+                    nodes: [
+                      {
+                        status: "COMPLETED",
+                        conclusion: "SUCCESS",
+                      },
+                      {
+                        status: "COMPLETED",
+                        conclusion: "SUCCESS",
+                      },
+                      {
+                        status: "PENDING",
+                      },
+                      {
+                        status: "QUEUED",
                       },
                     ],
                   },
