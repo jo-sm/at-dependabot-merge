@@ -9,11 +9,11 @@ async function action(token, owner, repo, runId, { onlySuccess }) {
     return;
   }
 
-  if (run.conclusion === "skipped" && onlySuccess) {
+  if (onlySuccess && !["success"].includes(run.conclusion)) {
     return;
   }
 
-  if (run.conclusion !== "success") {
+  if (!["success", "skipped"].includes(run.conclusion)) {
     return;
   }
 

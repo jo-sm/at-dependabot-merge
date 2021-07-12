@@ -88,11 +88,12 @@ describe("action function", () => {
     });
   });
 
-  describe("with successful workflow run request", () => {
+  describe.each([
+    { fixture: fixtures.getWorkflowRun.SUCCESS, title: "successful" },
+    { fixture: fixtures.getWorkflowRun.SKIPPED, title: "skipped" },
+  ])("with a $title workflow run request", ({ fixture }) => {
     beforeEach(() => {
-      githubClient.rest.actions.getWorkflowRun.mockResolvedValue(
-        fixtures.getWorkflowRun.SUCCESS
-      );
+      githubClient.rest.actions.getWorkflowRun.mockResolvedValue(fixture);
     });
 
     it("should throw if the GraphQL query fails", async () => {
@@ -151,13 +152,34 @@ describe("action function", () => {
     });
   });
 
-  describe("with all successful/skipped suites", () => {
+  describe.each([
+    {
+      title: "all successful suites",
+      runFixture: fixtures.getWorkflowRun.SUCCESS,
+      gqlFixture: fixtures.graphql.SUCCESS,
+    },
+    {
+      // This wouldn't happen in reality - it can't be all successful in graphQL but skipped in the REST request - but
+      // good to check anyway
+      title: "skipped provided run and all successful suites",
+      runFixture: fixtures.getWorkflowRun.SKIPPED,
+      gqlFixture: fixtures.graphql.SUCCESS,
+    },
+    {
+      title: "successful provided run and some skipped suites",
+      runFixture: fixtures.getWorkflowRun.SUCCESS,
+      gqlFixture: fixtures.graphql.SOME_SKIPPED,
+    },
+    {
+      title: "provided run and some other suites are skipped",
+      runFixture: fixtures.getWorkflowRun.SKIPPED,
+      gqlFixture: fixtures.graphql.SOME_SKIPPED,
+    },
+  ])("with $title", ({ runFixture, gqlFixture }) => {
     beforeEach(() => {
-      githubClient.rest.actions.getWorkflowRun.mockResolvedValue(
-        fixtures.getWorkflowRun.SUCCESS
-      );
+      githubClient.rest.actions.getWorkflowRun.mockResolvedValue(runFixture);
 
-      githubClient.graphql.mockResolvedValue(fixtures.graphql.SUCCESS);
+      githubClient.graphql.mockResolvedValue(gqlFixture);
     });
 
     it("should throw if the createComment request fails", async () => {
@@ -169,20 +191,6 @@ describe("action function", () => {
     });
 
     it("should create the expected comment and return true", async () => {
-      githubClient.rest.issues.createComment.mockResolvedValue();
-
-      await expect(callAction()).resolves.toBe(true);
-      expect(githubClient.rest.issues.createComment).toHaveBeenCalledWith({
-        repo: mockRepo,
-        owner: mockOwner,
-        issue_number:
-          fixtures.getWorkflowRun.SUCCESS.data.pull_requests[0].number,
-        body: "@dependabot merge",
-      });
-    });
-
-    it("should create the expected comment if some suites were skipped", async () => {
-      githubClient.graphql.mockResolvedValue(fixtures.graphql.SOME_SKIPPED);
       githubClient.rest.issues.createComment.mockResolvedValue();
 
       await expect(callAction()).resolves.toBe(true);
