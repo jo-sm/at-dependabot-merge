@@ -22,7 +22,7 @@ jobs:
     steps:
       # ... some steps before
       - name: Add merge comment for dependabot PRs
-        uses: jo-sm/at-dependabot-merge@v1
+        uses: jo-sm/at-dependabot-merge@v1.1
         with:
           run-id: ${{ github.event.workflow_run.id }}
           token: ${{ secrets.TOKEN_FOR_USER_WITH_PUSH_PERMS }}
@@ -69,7 +69,7 @@ jobs:
     steps:
       # ...
       - name: Add merge comment for dependabot PRs
-        uses: jo-sm/at-dependabot-merge@v1
+        uses: jo-sm/at-dependabot-merge@v1.1
         with:
           run-id: # ...
           token: # ...
