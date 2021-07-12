@@ -80,16 +80,9 @@ describe("github-client", () => {
         expect(await client.getPRAndChecksDetails("1234")).toStrictEqual({
           prCreatorUsername: response.repository.pullRequest.author.login,
           prCreatorType: response.repository.pullRequest.author.__typename,
-          checks: [
+          checkSuites:
             response.repository.pullRequest.commits.nodes[0].commit.checkSuites
-              .nodes[0].checkRuns.nodes[0],
-            response.repository.pullRequest.commits.nodes[0].commit.checkSuites
-              .nodes[1].checkRuns.nodes[0],
-            response.repository.pullRequest.commits.nodes[0].commit.checkSuites
-              .nodes[2].checkRuns.nodes[0],
-            response.repository.pullRequest.commits.nodes[0].commit.checkSuites
-              .nodes[2].checkRuns.nodes[1],
-          ],
+              .nodes,
         });
 
         expect(githubClient.graphql).toHaveBeenCalledWith(expect.any(String), {

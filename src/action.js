@@ -1,11 +1,19 @@
 const createClient = require("./github-client");
 
-async function action(token, owner, repo, runId) {
+async function action(token, owner, repo, runId, { onlySuccess }) {
   const client = createClient(token, owner, repo);
 
   const run = await client.getWorkflowRun(runId);
 
-  if (run.status !== "completed" || run.conclusion !== "success") {
+  if (run.status !== "completed") {
+    return;
+  }
+
+  if (run.conclusion === "skipped" && onlySuccess) {
+    return;
+  }
+
+  if (run.conclusion !== "success") {
     return;
   }
 
@@ -18,7 +26,7 @@ async function action(token, owner, repo, runId) {
   }
 
   const [{ number: prNumber }] = run.pullRequests;
-  const { prCreatorUsername, prCreatorType, checks } =
+  const { prCreatorUsername, prCreatorType, checkSuites } =
     await client.getPRAndChecksDetails(prNumber);
 
   const userIsDependabot =
@@ -28,16 +36,26 @@ async function action(token, owner, repo, runId) {
     return;
   }
 
-  const shouldCreateComment = checks.reduce((memo, check) => {
+  const shouldCreateComment = checkSuites.reduce((memo, suite) => {
     if (memo === false) {
       return false;
     }
 
-    if (check.status !== "COMPLETED" || check.conclusion !== "SUCCESS") {
+    if (suite.status !== "COMPLETED") {
       return false;
     }
 
-    return true;
+    // Allow skipped workflows if the user didn't explicitly require only successful workflows
+    if (suite.conclusion === "SKIPPED" && !onlySuccess) {
+      return true;
+    }
+
+    // Otherwise only allow successful workflows
+    if (suite.conclusion === "SUCCESS") {
+      return true;
+    }
+
+    return false;
   }, true);
 
   if (!shouldCreateComment) {

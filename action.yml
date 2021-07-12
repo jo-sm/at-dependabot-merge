@@ -10,6 +10,11 @@ inputs:
   run-id:
     description: Workflow run ID
     required: true
+  only-success:
+    description: |
+      If all workflow runs must be successful. By default workflows that are skipped are ignored, but to require everything to be successful
+      you can set this option.
+    required: false
 runs:
   using: "docker"
   image: "Dockerfile"

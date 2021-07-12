@@ -1,5 +1,4 @@
 const { getOctokit } = require("@actions/github");
-const { shallowFlatten } = require("./utils");
 
 /**
  * @param  {string} token Github personal access token
@@ -58,13 +57,8 @@ module.exports = function createSimpleGithubClient(token, owner, repo) {
                   commit {
                     checkSuites(last: 100) {
                       nodes {
-                        checkRuns(last: 100) {
-                          nodes {
-                            name
-                            conclusion
-                            status
-                          }
-                        }
+                        status
+                        conclusion
                       }
                     }
                   }
@@ -89,16 +83,12 @@ module.exports = function createSimpleGithubClient(token, owner, repo) {
         },
       } = await githubClient.graphql(query, queryVars);
 
-      const checks = shallowFlatten(
-        commitNodes[0].commit.checkSuites.nodes.map(
-          (node) => node.checkRuns.nodes
-        )
-      );
+      const checkSuites = commitNodes[0].commit.checkSuites.nodes;
 
       return {
         prCreatorUsername: author.login,
         prCreatorType: author.__typename,
-        checks,
+        checkSuites,
       };
     },
 

@@ -29,7 +29,8 @@ describe("action function", () => {
     };
 
     getOctokit.mockReturnValue(githubClient);
-    callAction = action.bind(null, mockToken, mockOwner, mockRepo, mockRunId);
+    callAction = ({ onlySuccess } = { onlySuccess: false }) =>
+      action(mockToken, mockOwner, mockRepo, mockRunId, { onlySuccess });
   });
 
   describe("workflow run request", () => {
@@ -46,12 +47,28 @@ describe("action function", () => {
       });
     });
 
+    it("should return undefined if the run was not completed", async () => {
+      githubClient.rest.actions.getWorkflowRun.mockResolvedValue(
+        fixtures.getWorkflowRun.NOT_COMPLETED
+      );
+
+      await expect(callAction()).resolves.toBeUndefined();
+    });
+
     it("should return undefined if the run was not successfully completed", async () => {
       githubClient.rest.actions.getWorkflowRun.mockResolvedValue(
         fixtures.getWorkflowRun.FAILURE
       );
 
       await expect(callAction()).resolves.toBeUndefined();
+    });
+
+    it("should return undefined if the run was skipped but onlySuccess is true", async () => {
+      githubClient.rest.actions.getWorkflowRun.mockResolvedValue(
+        fixtures.getWorkflowRun.SKIPPED
+      );
+
+      await expect(callAction({ onlySuccess: true })).resolves.toBeUndefined();
     });
 
     it("should throw if the workflow run had no PRs associated with it", async () => {
@@ -99,20 +116,42 @@ describe("action function", () => {
       await expect(callAction()).resolves.toBeUndefined();
     });
 
-    it("should return undefined if all checks are not successfully completed", async () => {
+    it("should return undefined if all suites are not successfully completed", async () => {
       githubClient.graphql.mockResolvedValue(fixtures.graphql.PARTIAL_SUCCESS);
 
       await expect(callAction()).resolves.toBeUndefined();
     });
 
-    it("should return undefined if all checks failed", async () => {
+    it("should return undefined if all suites failed", async () => {
       githubClient.graphql.mockResolvedValue(fixtures.graphql.TOTAL_FAILURE);
+
+      await expect(callAction()).resolves.toBeUndefined();
+    });
+
+    it("should return undefined if some suites were skipped and only successful suites are allowed", async () => {
+      githubClient.graphql.mockResolvedValue(fixtures.graphql.SOME_SKIPPED);
+
+      await expect(callAction({ onlySuccess: true })).resolves.toBeUndefined();
+    });
+
+    it("should return undefined if some suites were skipped and some failed", async () => {
+      githubClient.graphql.mockResolvedValue(
+        fixtures.graphql.SOME_SKIPPED_WITH_FAILURE
+      );
+
+      await expect(callAction()).resolves.toBeUndefined();
+    });
+
+    it("should return undefined if some suites are pending", async () => {
+      githubClient.graphql.mockResolvedValue(
+        fixtures.graphql.SOME_SUITES_NOT_COMPLETED
+      );
 
       await expect(callAction()).resolves.toBeUndefined();
     });
   });
 
-  describe("with all successful checks", () => {
+  describe("with all successful/skipped suites", () => {
     beforeEach(() => {
       githubClient.rest.actions.getWorkflowRun.mockResolvedValue(
         fixtures.getWorkflowRun.SUCCESS
@@ -130,6 +169,20 @@ describe("action function", () => {
     });
 
     it("should create the expected comment and return true", async () => {
+      githubClient.rest.issues.createComment.mockResolvedValue();
+
+      await expect(callAction()).resolves.toBe(true);
+      expect(githubClient.rest.issues.createComment).toHaveBeenCalledWith({
+        repo: mockRepo,
+        owner: mockOwner,
+        issue_number:
+          fixtures.getWorkflowRun.SUCCESS.data.pull_requests[0].number,
+        body: "@dependabot merge",
+      });
+    });
+
+    it("should create the expected comment if some suites were skipped", async () => {
+      githubClient.graphql.mockResolvedValue(fixtures.graphql.SOME_SKIPPED);
       githubClient.rest.issues.createComment.mockResolvedValue();
 
       await expect(callAction()).resolves.toBe(true);
