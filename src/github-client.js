@@ -59,6 +59,9 @@ module.exports = function createSimpleGithubClient(token, owner, repo) {
                       nodes {
                         status
                         conclusion
+                        checkRuns {
+                          totalCount
+                        }
                       }
                     }
                   }
@@ -83,7 +86,19 @@ module.exports = function createSimpleGithubClient(token, owner, repo) {
         },
       } = await githubClient.graphql(query, queryVars);
 
-      const checkSuites = commitNodes[0].commit.checkSuites.nodes;
+      // There's a bug on Github where some suites are created, and queued, but have no runs associated with them. For now,
+      // it's okay to just filter those, since the case when a suite is queued and should _not_ have any runs associated with it
+      // seems small.
+      const checkSuites = commitNodes[0].commit.checkSuites.nodes.reduce(
+        (acc, suite) => {
+          if (suite.checkRuns.totalCount !== 0) {
+            acc.push(suite);
+          }
+
+          return acc;
+        },
+        []
+      );
 
       return {
         prCreatorUsername: author.login,

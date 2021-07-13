@@ -79,6 +79,21 @@ This works identically if you want to have the `if` condition inside of the `ste
 
 For more details about the `if` syntax, checkout the Github docs for [`jobs.<job_id>.if`](https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idif) and [`jobs.<job_id>.steps[*].if`](https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idstepsif).
 
+# Development
+
+## Running tests
+
+The test suites are run using Jest, and you can run it using `npm test`. To run in watch mode, you can run `npm run test:watch`.
+
+### Integration test
+
+There is an integration test suite that runs against real runs and uses the Github API. This test expects the `GITHUB_TOKEN` environment variable to be available:
+
+```
+export GITHUB_TOKEN="..."
+npm run test:watch
+```
+
 # Issues and pull requests
 
 Something not working, or something missing for your use case? [Create an issue](https://github.com/jo-sm/automerge-dependabot/issues) and describe in detail your bug or feature request. [I also accept PRs](https://github.com/jo-sm/automerge-dependabot/compare) :-)
