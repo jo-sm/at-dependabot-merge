@@ -34,6 +34,12 @@ describe("action function", () => {
   });
 
   describe("workflow run request", () => {
+    it("is a bad test case!", async () => {
+      expect(true).toBeTruthy();
+
+      throw new Error("what");
+    });
+
     it("should throw if the getWorkflowRun request fails", async () => {
       const error = new Error("getWorkflowRun erred");
 
