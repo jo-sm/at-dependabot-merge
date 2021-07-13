@@ -175,6 +175,16 @@ describe("action function", () => {
       runFixture: fixtures.getWorkflowRun.SKIPPED,
       gqlFixture: fixtures.graphql.SOME_SKIPPED,
     },
+    {
+      title: "successful provided run and weird suite data",
+      runFixture: fixtures.getWorkflowRun.SUCCESS,
+      gqlFixture: fixtures.graphql.SOME_NO_CHECK_RUNS,
+    },
+    {
+      title: "skipped provided run and weird suite data",
+      runFixture: fixtures.getWorkflowRun.SKIPPED,
+      gqlFixture: fixtures.graphql.SOME_NO_CHECK_RUNS,
+    },
   ])("with $title", ({ runFixture, gqlFixture }) => {
     beforeEach(() => {
       githubClient.rest.actions.getWorkflowRun.mockResolvedValue(runFixture);

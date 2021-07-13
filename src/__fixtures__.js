@@ -59,14 +59,17 @@ const fixtures = {
                       {
                         status: "COMPLETED",
                         conclusion: "SUCCESS",
+                        checkRuns: { totalCount: 1 },
                       },
                       {
                         status: "COMPLETED",
                         conclusion: "SUCCESS",
+                        checkRuns: { totalCount: 1 },
                       },
                       {
                         status: "COMPLETED",
                         conclusion: "SUCCESS",
+                        checkRuns: { totalCount: 1 },
                       },
                     ],
                   },
@@ -93,6 +96,7 @@ const fixtures = {
                       {
                         status: "COMPLETED",
                         conclusion: "SUCCESS",
+                        checkRuns: { totalCount: 1 },
                       },
                     ],
                   },
@@ -119,10 +123,12 @@ const fixtures = {
                       {
                         status: "COMPLETED",
                         conclusion: "SUCCESS",
+                        checkRuns: { totalCount: 1 },
                       },
                       {
                         status: "COMPLETED",
                         conclusion: "FAILURE",
+                        checkRuns: { totalCount: 1 },
                       },
                     ],
                   },
@@ -149,10 +155,12 @@ const fixtures = {
                       {
                         status: "COMPLETED",
                         conclusion: "FAILURE",
+                        checkRuns: { totalCount: 1 },
                       },
                       {
                         status: "COMPLETED",
                         conclusion: "FAILURE",
+                        checkRuns: { totalCount: 1 },
                       },
                     ],
                   },
@@ -179,10 +187,12 @@ const fixtures = {
                       {
                         status: "COMPLETED",
                         conclusion: "SKIPPED",
+                        checkRuns: { totalCount: 1 },
                       },
                       {
                         status: "COMPLETED",
                         conclusion: "SUCCESS",
+                        checkRuns: { totalCount: 1 },
                       },
                     ],
                   },
@@ -209,14 +219,17 @@ const fixtures = {
                       {
                         status: "COMPLETED",
                         conclusion: "SKIPPED",
+                        checkRuns: { totalCount: 1 },
                       },
                       {
                         status: "COMPLETED",
                         conclusion: "SUCCESS",
+                        checkRuns: { totalCount: 1 },
                       },
                       {
                         status: "COMPLETED",
                         conclusion: "FAILURE",
+                        checkRuns: { totalCount: 1 },
                       },
                     ],
                   },
@@ -243,16 +256,56 @@ const fixtures = {
                       {
                         status: "COMPLETED",
                         conclusion: "SUCCESS",
+                        checkRuns: { totalCount: 1 },
                       },
                       {
                         status: "COMPLETED",
                         conclusion: "SUCCESS",
+                        checkRuns: { totalCount: 1 },
                       },
                       {
                         status: "PENDING",
+                        checkRuns: { totalCount: 1 },
                       },
                       {
                         status: "QUEUED",
+                        checkRuns: { totalCount: 1 },
+                      },
+                    ],
+                  },
+                },
+              },
+            ],
+          },
+        },
+      },
+    },
+    SOME_NO_CHECK_RUNS: {
+      repository: {
+        pullRequest: {
+          author: {
+            login: "dependabot",
+            __typename: "Bot",
+          },
+          commits: {
+            nodes: [
+              {
+                commit: {
+                  checkSuites: {
+                    nodes: [
+                      {
+                        status: "COMPLETED",
+                        conclusion: "SUCCESS",
+                        checkRuns: { totalCount: 1 },
+                      },
+                      {
+                        status: "COMPLETED",
+                        conclusion: "SUCCESS",
+                        checkRuns: { totalCount: 1 },
+                      },
+                      {
+                        status: "QUEUED",
+                        checkRuns: { totalCount: 0 },
                       },
                     ],
                   },

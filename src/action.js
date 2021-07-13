@@ -1,6 +1,14 @@
 const createClient = require("./github-client");
 
-async function action(token, owner, repo, runId, { onlySuccess }) {
+async function action(
+  token,
+  owner,
+  repo,
+  runId,
+  // Right now, I don't have a failing Dependabot PR in one of my repos. Once I do, I don't need special cases
+  // for the integration test (which is an antipattern).
+  { onlySuccess = false, __integrationTest = false }
+) {
   const client = createClient(token, owner, repo);
 
   const run = await client.getWorkflowRun(runId);
@@ -30,7 +38,9 @@ async function action(token, owner, repo, runId, { onlySuccess }) {
     await client.getPRAndChecksDetails(prNumber);
 
   const userIsDependabot =
-    prCreatorUsername.match(/^dependabot/) && prCreatorType === "Bot";
+    // We allow the integration test to bypass this check, since we can't simulate a dependabot PR
+    (prCreatorUsername.match(/^dependabot/) && prCreatorType === "Bot") ||
+    __integrationTest;
 
   if (!userIsDependabot) {
     return;
@@ -62,7 +72,9 @@ async function action(token, owner, repo, runId, { onlySuccess }) {
     return;
   }
 
-  await client.createComment(prNumber, "@dependabot merge");
+  if (!__integrationTest) {
+    await client.createComment(prNumber, "@dependabot merge");
+  }
 
   return true;
 }

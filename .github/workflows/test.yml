@@ -21,3 +21,5 @@ jobs:
       - run: npm run lint:prettier
       - run: npm run lint:eslint
       - run: npm test
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
