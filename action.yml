@@ -15,6 +15,10 @@ inputs:
       If all workflow runs must be successful. By default workflows that are skipped are ignored, but to require everything to be successful
       you can set this option.
     required: false
+  only-given-run-id:
+    description: |
+      Only use the provided run ID's check suite. By default all check suites for the PR are considered when creating the comment.
+    required: false
 runs:
   using: "docker"
   image: "Dockerfile"

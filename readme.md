@@ -34,14 +34,14 @@ This may look familar if you've seen [the Github blogpost about keeping your wor
 
 The action works like this:
 
-1. For the provided `run-id`, ensure the associated workflow is completed and successful or skipped.
-2. Get the PR associated with the `run-id`.
-3. For this PR, ensure that the author is `dependabot`.
-4. For this PR, ensure that all workflow runs are successful or skipped.
+1. Get the PR associated with the `run-id`.
+2. For this PR, ensure that the author is `dependabot`.
+3. For this PR, ensure that all workflow runs are successful or skipped.
 
-   To only allow successful workflow runs, you can provide `only-success: "true"` to the job.
+   To only allow successful workflow runs, you can add `only-success: "true"` to your workflow config.
+   To only care about the provided `run-id`, you can add `only-given-run: "true"` to your workflow config.
 
-5. Once all of the above are okay, then a `@dependabot merge` commit is created by the user associated with `token`.
+4. Once all of the above are okay, then a `@dependabot merge` commit is created by the user associated with `token`.
 
    **NOTE**: This user must have write/push permissions to the repository. **Do not use the `secrets.GITHUB_TOKEN` access token!** Instead use a bot account or your own personal access token.
 
@@ -54,6 +54,8 @@ This action has required two inputs, `run-id` and `token`, and one optional inpu
 `token` is an access token for a user who has push permissions for the repository. **Do not use the `secrets.GITHUB_TOKEN` token here**; the `GITHUB_TOKEN` user won't have push permissions for your repo. You should either use a personal access token of your own, or use one from a bot account.
 
 `only-success` is an optional input that allows you to require all workflow runs to be successful. By default, skipped workflow runs are ignored and this option allows you to restrict this.
+
+`only-given-run` is an optional input that lets you tell the action to only care about the check suite associated with the provided `run-id`. By default all check suites are considered and all must be successful. **Note** that the normal rules apply and if the provided run ID was skipped, it will still be considered "ok" unless `only-success` is provided.
 
 ## Skipping action when the PR isn't by Dependabot
 

@@ -57,6 +57,9 @@ module.exports = function createSimpleGithubClient(token, owner, repo) {
                   commit {
                     checkSuites(last: 100) {
                       nodes {
+                        workflowRun {
+                          databaseId
+                        }
                         status
                         conclusion
                         checkRuns {

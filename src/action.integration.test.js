@@ -13,9 +13,8 @@ describe("Action integration test", () => {
   });
 
   it("should return true for a successful PR", async () => {
-    // Known PR with all passing but bad data from API. This should be considered successful for now
     await expect(
-      callAction("jo-sm", "stylelint_d", "1025325797")
+      callAction("jo-sm", "at-dependabot-merge", "1026238401")
     ).resolves.toBe(true);
   });
 
