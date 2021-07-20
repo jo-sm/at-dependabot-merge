@@ -416,6 +416,81 @@ const fixtures = {
         },
       },
     },
+    SOME_WORKFLOW_RUN_MISSING_BUT_SUCCESSFUL: {
+      repository: {
+        pullRequest: {
+          author: {
+            login: "dependabot",
+            __typename: "Bot",
+          },
+          commits: {
+            nodes: [
+              {
+                commit: {
+                  checkSuites: {
+                    nodes: [
+                      {
+                        workflowRun: {
+                          databaseId: MOCK_RUN_ID,
+                        },
+                        status: "COMPLETED",
+                        conclusion: "SUCCESS",
+                        checkRuns: { totalCount: 1 },
+                      },
+                      {
+                        status: "COMPLETED",
+                        conclusion: "FAILURE",
+                        checkRuns: { totalCount: 1 },
+                      },
+                      {
+                        status: "QUEUED",
+                        checkRuns: { totalCount: 0 },
+                      },
+                    ],
+                  },
+                },
+              },
+            ],
+          },
+        },
+      },
+    },
+    ALL_WORKFLOW_RUN_DATA_MISSING: {
+      repository: {
+        pullRequest: {
+          author: {
+            login: "dependabot",
+            __typename: "Bot",
+          },
+          commits: {
+            nodes: [
+              {
+                commit: {
+                  checkSuites: {
+                    nodes: [
+                      {
+                        status: "COMPLETED",
+                        conclusion: "SUCCESS",
+                        checkRuns: { totalCount: 1 },
+                      },
+                      {
+                        status: "COMPLETED",
+                        conclusion: "FAILURE",
+                        checkRuns: { totalCount: 1 },
+                      },
+                      {
+                        status: "QUEUED",
+                        checkRuns: { totalCount: 0 },
+                      },
+                    ],
+                  },
+                },
+              },
+            ],
+          },
+        },
+      },
+    },
   },
 };
 

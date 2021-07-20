@@ -34,35 +34,39 @@ async function action(
     return;
   }
 
-  const shouldCreateComment = checkSuites
-    .filter((suite) => {
-      if (onlyGivenRun) {
-        return suite.workflowRun.databaseId === runId;
-      }
+  const consideredSuites = checkSuites.filter((suite) => {
+    if (onlyGivenRun) {
+      return suite?.workflowRun?.databaseId === runId;
+    }
 
-      return true;
-    })
-    .reduce((memo, suite) => {
-      if (memo === false) {
-        return false;
-      }
+    return true;
+  });
 
-      if (suite.status !== "COMPLETED") {
-        return false;
-      }
+  if (consideredSuites.length === 0) {
+    return;
+  }
 
-      // Allow skipped workflows if the user didn't explicitly require only successful workflows
-      if (suite.conclusion === "SKIPPED" && !onlySuccess) {
-        return true;
-      }
-
-      // Otherwise only allow successful workflows
-      if (suite.conclusion === "SUCCESS") {
-        return true;
-      }
-
+  const shouldCreateComment = consideredSuites.reduce((memo, suite) => {
+    if (memo === false) {
       return false;
-    }, true);
+    }
+
+    if (suite.status !== "COMPLETED") {
+      return false;
+    }
+
+    // Allow skipped workflows if the user didn't explicitly require only successful workflows
+    if (suite.conclusion === "SKIPPED" && !onlySuccess) {
+      return true;
+    }
+
+    // Otherwise only allow successful workflows
+    if (suite.conclusion === "SUCCESS") {
+      return true;
+    }
+
+    return false;
+  }, true);
 
   if (!shouldCreateComment) {
     return;

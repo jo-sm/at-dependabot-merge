@@ -133,6 +133,14 @@ describe("action function", () => {
 
       await expect(callAction()).resolves.toBeUndefined();
     });
+
+    it("should return undefined if all suites are missing workflow run data and onlyGivenRun is true", async () => {
+      githubClient.graphql.mockResolvedValue(
+        fixtures.graphql.ALL_WORKFLOW_RUN_DATA_MISSING
+      );
+
+      await expect(callAction({ onlyGivenRun: true })).resolves.toBeUndefined();
+    });
   });
 
   describe.each([
@@ -157,6 +165,12 @@ describe("action function", () => {
       gqlFixture: fixtures.graphql.SOME_FAILURE_WITH_KNOWN_WORKFLOW_RUN_ID,
       actionArgs: { onlyGivenRun: true },
     },
+    {
+      title:
+        "only the given run ID is successful and other check suites are missing workflow data",
+      gqlFixture: fixtures.graphql.SOME_WORKFLOW_RUN_MISSING_BUT_SUCCESSFUL,
+      actionArgs: { onlyGivenRun: true },
+    },
   ])("with $title", ({ gqlFixture, actionArgs }) => {
     beforeEach(() => {
       githubClient.rest.actions.getWorkflowRun.mockResolvedValue(
@@ -173,7 +187,7 @@ describe("action function", () => {
       await expect(callAction(actionArgs)).rejects.toThrow(error);
     });
 
-    it("should create the expected comment and return t`rue", async () => {
+    it("should create the expected comment and return true", async () => {
       githubClient.rest.issues.createComment.mockResolvedValue();
 
       await expect(callAction(actionArgs)).resolves.toBe(true);

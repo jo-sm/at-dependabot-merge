@@ -12,11 +12,11 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: Use Node.js 12
+      - name: Use Node.js 14
         uses: actions/setup-node@v1
         with:
           # Since the action only runs on "node12"
-          node-version: "12.x"
+          node-version: "14.x"
       - run: npm ci
       - run: npm run lint:prettier
       - run: npm run lint:eslint
