@@ -7,23 +7,11 @@ async function action(
   runId,
   // Right now, I don't have a failing Dependabot PR in one of my repos. Once I do, I don't need special cases
   // for the integration test (which is an antipattern).
-  { onlySuccess = false, __integrationTest = false }
+  { onlySuccess = false, onlyGivenRun = false, __integrationTest = false }
 ) {
   const client = createClient(token, owner, repo);
 
   const run = await client.getWorkflowRun(runId);
-
-  if (run.status !== "completed") {
-    return;
-  }
-
-  if (onlySuccess && !["success"].includes(run.conclusion)) {
-    return;
-  }
-
-  if (!["success", "skipped"].includes(run.conclusion)) {
-    return;
-  }
 
   // If the workflow is associated with a merged PR, the `pullRequests` array will be empty
   if (run.pullRequests.length !== 1) {
@@ -46,7 +34,19 @@ async function action(
     return;
   }
 
-  const shouldCreateComment = checkSuites.reduce((memo, suite) => {
+  const consideredSuites = checkSuites.filter((suite) => {
+    if (onlyGivenRun) {
+      return suite?.workflowRun?.databaseId === runId;
+    }
+
+    return true;
+  });
+
+  if (consideredSuites.length === 0) {
+    return;
+  }
+
+  const shouldCreateComment = consideredSuites.reduce((memo, suite) => {
     if (memo === false) {
       return false;
     }

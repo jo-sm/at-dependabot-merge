@@ -1,11 +1,20 @@
+function generateRandomId(length = 16) {
+  const alphabet = "abcdefghijklmnopqrstuvwxyz".split("");
+  const result = [];
+
+  while (length > 0) {
+    result.push(alphabet[Math.floor(Math.random() * alphabet.length)]);
+    length--;
+  }
+
+  return result.join("");
+}
+
+const MOCK_RUN_ID = "mock-run-id";
+
 const fixtures = {
+  MOCK_RUN_ID,
   getWorkflowRun: {
-    NOT_COMPLETED: {
-      data: {
-        status: "queued",
-        pull_requests: [{ number: 7 }],
-      },
-    },
     SUCCESS: {
       data: {
         status: "completed",
@@ -27,20 +36,6 @@ const fixtures = {
         pull_requests: [],
       },
     },
-    FAILURE: {
-      data: {
-        status: "completed",
-        conclusion: "failure",
-        pull_requests: [{ number: 7 }],
-      },
-    },
-    SKIPPED: {
-      data: {
-        status: "completed",
-        conclusion: "skipped",
-        pull_requests: [{ number: 7 }],
-      },
-    },
   },
   graphql: {
     SUCCESS: {
@@ -57,16 +52,25 @@ const fixtures = {
                   checkSuites: {
                     nodes: [
                       {
+                        workflowRun: {
+                          databaseId: generateRandomId(),
+                        },
                         status: "COMPLETED",
                         conclusion: "SUCCESS",
                         checkRuns: { totalCount: 1 },
                       },
                       {
+                        workflowRun: {
+                          databaseId: generateRandomId(),
+                        },
                         status: "COMPLETED",
                         conclusion: "SUCCESS",
                         checkRuns: { totalCount: 1 },
                       },
                       {
+                        workflowRun: {
+                          databaseId: generateRandomId(),
+                        },
                         status: "COMPLETED",
                         conclusion: "SUCCESS",
                         checkRuns: { totalCount: 1 },
@@ -94,6 +98,9 @@ const fixtures = {
                   checkSuites: {
                     nodes: [
                       {
+                        workflowRun: {
+                          databaseId: generateRandomId(),
+                        },
                         status: "COMPLETED",
                         conclusion: "SUCCESS",
                         checkRuns: { totalCount: 1 },
@@ -121,11 +128,17 @@ const fixtures = {
                   checkSuites: {
                     nodes: [
                       {
+                        workflowRun: {
+                          databaseId: generateRandomId(),
+                        },
                         status: "COMPLETED",
                         conclusion: "SUCCESS",
                         checkRuns: { totalCount: 1 },
                       },
                       {
+                        workflowRun: {
+                          databaseId: generateRandomId(),
+                        },
                         status: "COMPLETED",
                         conclusion: "FAILURE",
                         checkRuns: { totalCount: 1 },
@@ -153,11 +166,17 @@ const fixtures = {
                   checkSuites: {
                     nodes: [
                       {
+                        workflowRun: {
+                          databaseId: generateRandomId(),
+                        },
                         status: "COMPLETED",
                         conclusion: "FAILURE",
                         checkRuns: { totalCount: 1 },
                       },
                       {
+                        workflowRun: {
+                          databaseId: generateRandomId(),
+                        },
                         status: "COMPLETED",
                         conclusion: "FAILURE",
                         checkRuns: { totalCount: 1 },
@@ -185,11 +204,17 @@ const fixtures = {
                   checkSuites: {
                     nodes: [
                       {
+                        workflowRun: {
+                          databaseId: generateRandomId(),
+                        },
                         status: "COMPLETED",
                         conclusion: "SKIPPED",
                         checkRuns: { totalCount: 1 },
                       },
                       {
+                        workflowRun: {
+                          databaseId: generateRandomId(),
+                        },
                         status: "COMPLETED",
                         conclusion: "SUCCESS",
                         checkRuns: { totalCount: 1 },
@@ -217,16 +242,25 @@ const fixtures = {
                   checkSuites: {
                     nodes: [
                       {
+                        workflowRun: {
+                          databaseId: generateRandomId(),
+                        },
                         status: "COMPLETED",
                         conclusion: "SKIPPED",
                         checkRuns: { totalCount: 1 },
                       },
                       {
+                        workflowRun: {
+                          databaseId: generateRandomId(),
+                        },
                         status: "COMPLETED",
                         conclusion: "SUCCESS",
                         checkRuns: { totalCount: 1 },
                       },
                       {
+                        workflowRun: {
+                          databaseId: generateRandomId(),
+                        },
                         status: "COMPLETED",
                         conclusion: "FAILURE",
                         checkRuns: { totalCount: 1 },
@@ -254,20 +288,32 @@ const fixtures = {
                   checkSuites: {
                     nodes: [
                       {
+                        workflowRun: {
+                          databaseId: generateRandomId(),
+                        },
                         status: "COMPLETED",
                         conclusion: "SUCCESS",
                         checkRuns: { totalCount: 1 },
                       },
                       {
+                        workflowRun: {
+                          databaseId: generateRandomId(),
+                        },
                         status: "COMPLETED",
                         conclusion: "SUCCESS",
                         checkRuns: { totalCount: 1 },
                       },
                       {
+                        workflowRun: {
+                          databaseId: generateRandomId(),
+                        },
                         status: "PENDING",
                         checkRuns: { totalCount: 1 },
                       },
                       {
+                        workflowRun: {
+                          databaseId: generateRandomId(),
+                        },
                         status: "QUEUED",
                         checkRuns: { totalCount: 1 },
                       },
@@ -294,13 +340,142 @@ const fixtures = {
                   checkSuites: {
                     nodes: [
                       {
+                        workflowRun: {
+                          databaseId: generateRandomId(),
+                        },
+                        status: "COMPLETED",
+                        conclusion: "SUCCESS",
+                        checkRuns: { totalCount: 1 },
+                      },
+                      {
+                        workflowRun: {
+                          databaseId: generateRandomId(),
+                        },
+                        status: "COMPLETED",
+                        conclusion: "SUCCESS",
+                        checkRuns: { totalCount: 1 },
+                      },
+                      {
+                        workflowRun: {
+                          databaseId: generateRandomId(),
+                        },
+                        status: "QUEUED",
+                        checkRuns: { totalCount: 0 },
+                      },
+                    ],
+                  },
+                },
+              },
+            ],
+          },
+        },
+      },
+    },
+    SOME_FAILURE_WITH_KNOWN_WORKFLOW_RUN_ID: {
+      repository: {
+        pullRequest: {
+          author: {
+            login: "dependabot",
+            __typename: "Bot",
+          },
+          commits: {
+            nodes: [
+              {
+                commit: {
+                  checkSuites: {
+                    nodes: [
+                      {
+                        workflowRun: {
+                          databaseId: MOCK_RUN_ID,
+                        },
+                        status: "COMPLETED",
+                        conclusion: "SUCCESS",
+                        checkRuns: { totalCount: 1 },
+                      },
+                      {
+                        workflowRun: {
+                          databaseId: generateRandomId(),
+                        },
+                        status: "COMPLETED",
+                        conclusion: "FAILURE",
+                        checkRuns: { totalCount: 1 },
+                      },
+                      {
+                        workflowRun: {
+                          databaseId: generateRandomId(),
+                        },
+                        status: "QUEUED",
+                        checkRuns: { totalCount: 0 },
+                      },
+                    ],
+                  },
+                },
+              },
+            ],
+          },
+        },
+      },
+    },
+    SOME_WORKFLOW_RUN_MISSING_BUT_SUCCESSFUL: {
+      repository: {
+        pullRequest: {
+          author: {
+            login: "dependabot",
+            __typename: "Bot",
+          },
+          commits: {
+            nodes: [
+              {
+                commit: {
+                  checkSuites: {
+                    nodes: [
+                      {
+                        workflowRun: {
+                          databaseId: MOCK_RUN_ID,
+                        },
                         status: "COMPLETED",
                         conclusion: "SUCCESS",
                         checkRuns: { totalCount: 1 },
                       },
                       {
                         status: "COMPLETED",
+                        conclusion: "FAILURE",
+                        checkRuns: { totalCount: 1 },
+                      },
+                      {
+                        status: "QUEUED",
+                        checkRuns: { totalCount: 0 },
+                      },
+                    ],
+                  },
+                },
+              },
+            ],
+          },
+        },
+      },
+    },
+    ALL_WORKFLOW_RUN_DATA_MISSING: {
+      repository: {
+        pullRequest: {
+          author: {
+            login: "dependabot",
+            __typename: "Bot",
+          },
+          commits: {
+            nodes: [
+              {
+                commit: {
+                  checkSuites: {
+                    nodes: [
+                      {
+                        status: "COMPLETED",
                         conclusion: "SUCCESS",
+                        checkRuns: { totalCount: 1 },
+                      },
+                      {
+                        status: "COMPLETED",
+                        conclusion: "FAILURE",
                         checkRuns: { totalCount: 1 },
                       },
                       {

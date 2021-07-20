@@ -9,7 +9,7 @@ jest.mock("@actions/github", () => ({
 const mockToken = "mock-token";
 const mockOwner = "mock-owner";
 const mockRepo = "mock-repo";
-const mockRunId = "mock-run-id";
+const mockRunId = fixtures.MOCK_RUN_ID;
 
 describe("action function", () => {
   let githubClient;
@@ -29,8 +29,16 @@ describe("action function", () => {
     };
 
     getOctokit.mockReturnValue(githubClient);
-    callAction = ({ onlySuccess } = { onlySuccess: false }) =>
-      action(mockToken, mockOwner, mockRepo, mockRunId, { onlySuccess });
+    callAction = (
+      { onlySuccess, onlyGivenRun } = {
+        onlySuccess: false,
+        onlyGivenRun: false,
+      }
+    ) =>
+      action(mockToken, mockOwner, mockRepo, mockRunId, {
+        onlySuccess,
+        onlyGivenRun,
+      });
   });
 
   describe("workflow run request", () => {
@@ -45,30 +53,6 @@ describe("action function", () => {
         owner: mockOwner,
         run_id: mockRunId,
       });
-    });
-
-    it("should return undefined if the run was not completed", async () => {
-      githubClient.rest.actions.getWorkflowRun.mockResolvedValue(
-        fixtures.getWorkflowRun.NOT_COMPLETED
-      );
-
-      await expect(callAction()).resolves.toBeUndefined();
-    });
-
-    it("should return undefined if the run was not successfully completed", async () => {
-      githubClient.rest.actions.getWorkflowRun.mockResolvedValue(
-        fixtures.getWorkflowRun.FAILURE
-      );
-
-      await expect(callAction()).resolves.toBeUndefined();
-    });
-
-    it("should return undefined if the run was skipped but onlySuccess is true", async () => {
-      githubClient.rest.actions.getWorkflowRun.mockResolvedValue(
-        fixtures.getWorkflowRun.SKIPPED
-      );
-
-      await expect(callAction({ onlySuccess: true })).resolves.toBeUndefined();
     });
 
     it("should throw if the workflow run had no PRs associated with it", async () => {
@@ -88,12 +72,11 @@ describe("action function", () => {
     });
   });
 
-  describe.each([
-    { fixture: fixtures.getWorkflowRun.SUCCESS, title: "successful" },
-    { fixture: fixtures.getWorkflowRun.SKIPPED, title: "skipped" },
-  ])("with a $title workflow run request", ({ fixture }) => {
+  describe("with a successful workflow run request", () => {
     beforeEach(() => {
-      githubClient.rest.actions.getWorkflowRun.mockResolvedValue(fixture);
+      githubClient.rest.actions.getWorkflowRun.mockResolvedValue(
+        fixtures.getWorkflowRun.SUCCESS
+      );
     });
 
     it("should throw if the GraphQL query fails", async () => {
@@ -150,45 +133,49 @@ describe("action function", () => {
 
       await expect(callAction()).resolves.toBeUndefined();
     });
+
+    it("should return undefined if all suites are missing workflow run data and onlyGivenRun is true", async () => {
+      githubClient.graphql.mockResolvedValue(
+        fixtures.graphql.ALL_WORKFLOW_RUN_DATA_MISSING
+      );
+
+      await expect(callAction({ onlyGivenRun: true })).resolves.toBeUndefined();
+    });
   });
 
   describe.each([
     {
       title: "all successful suites",
-      runFixture: fixtures.getWorkflowRun.SUCCESS,
       gqlFixture: fixtures.graphql.SUCCESS,
+      actionArgs: {},
     },
     {
-      // This wouldn't happen in reality - it can't be all successful in graphQL but skipped in the REST request - but
-      // good to check anyway
-      title: "skipped provided run and all successful suites",
-      runFixture: fixtures.getWorkflowRun.SKIPPED,
-      gqlFixture: fixtures.graphql.SUCCESS,
-    },
-    {
-      title: "successful provided run and some skipped suites",
-      runFixture: fixtures.getWorkflowRun.SUCCESS,
+      title: "some skipped suites",
       gqlFixture: fixtures.graphql.SOME_SKIPPED,
+      actionArgs: {},
     },
     {
-      title: "provided run and some other suites are skipped",
-      runFixture: fixtures.getWorkflowRun.SKIPPED,
-      gqlFixture: fixtures.graphql.SOME_SKIPPED,
-    },
-    {
-      title: "successful provided run and weird suite data",
-      runFixture: fixtures.getWorkflowRun.SUCCESS,
+      title: "weird suite data",
       gqlFixture: fixtures.graphql.SOME_NO_CHECK_RUNS,
+      actionArgs: {},
     },
     {
-      title: "skipped provided run and weird suite data",
-      runFixture: fixtures.getWorkflowRun.SKIPPED,
-      gqlFixture: fixtures.graphql.SOME_NO_CHECK_RUNS,
+      title:
+        "only the given run id is successful but that is the only one cared about",
+      gqlFixture: fixtures.graphql.SOME_FAILURE_WITH_KNOWN_WORKFLOW_RUN_ID,
+      actionArgs: { onlyGivenRun: true },
     },
-  ])("with $title", ({ runFixture, gqlFixture }) => {
+    {
+      title:
+        "only the given run ID is successful and other check suites are missing workflow data",
+      gqlFixture: fixtures.graphql.SOME_WORKFLOW_RUN_MISSING_BUT_SUCCESSFUL,
+      actionArgs: { onlyGivenRun: true },
+    },
+  ])("with $title", ({ gqlFixture, actionArgs }) => {
     beforeEach(() => {
-      githubClient.rest.actions.getWorkflowRun.mockResolvedValue(runFixture);
-
+      githubClient.rest.actions.getWorkflowRun.mockResolvedValue(
+        fixtures.getWorkflowRun.SUCCESS
+      );
       githubClient.graphql.mockResolvedValue(gqlFixture);
     });
 
@@ -197,13 +184,13 @@ describe("action function", () => {
 
       githubClient.rest.issues.createComment.mockRejectedValue(error);
 
-      await expect(callAction()).rejects.toThrow(error);
+      await expect(callAction(actionArgs)).rejects.toThrow(error);
     });
 
     it("should create the expected comment and return true", async () => {
       githubClient.rest.issues.createComment.mockResolvedValue();
 
-      await expect(callAction()).resolves.toBe(true);
+      await expect(callAction(actionArgs)).resolves.toBe(true);
       expect(githubClient.rest.issues.createComment).toHaveBeenCalledWith({
         repo: mockRepo,
         owner: mockOwner,
