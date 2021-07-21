@@ -15,7 +15,7 @@ module.exports = function createSimpleGithubClient(token, owner, repo) {
 
   return {
     /**
-     * @param  {string} runId The workflow run ID
+     * @param  {number} runId The workflow run ID
      * @return {WorkflowRun} An object containing the status, conclusion, and an array of pull request objects that
      *                       just has `number`.
      * @example const { status, conclusion, pullRequests } = await client.getWorkflowRun(runId);
